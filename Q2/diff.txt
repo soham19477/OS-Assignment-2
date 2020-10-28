@@ -1,1 +1,39 @@
 # The diff should be in the form of text (Not image).
+
+diff -r original/arch/x86/entry/syscalls/syscall_64.tbl linux-5.9.1/arch/x86/entry/syscalls/syscall_64.tbl
+363a364
+> 440 common 	sh_task_info	sys_sh_task_info
+Only in linux-5.9.1/certs: signing_key.pem
+Only in linux-5.9.1/certs: signing_key.x509
+Only in linux-5.9.1/certs: x509.genkey
+diff -r original/kernel/sys.c linux-5.9.1/kernel/sys.c
+45a46,47
+> #include <linux/types.h>
+> 
+2697a2700,2721
+> 
+> SYSCALL_DEFINE2(sh_task_info, pid_t, proc, char *, fno)
+> {
+> 	// printk(KERN_ALERT "\nI'm in\n");
+> 	// size_t res;
+> 	// struct file* dest;
+> 	struct file* dest=filp_open(fno, O_CREAT|O_WRONLY|O_APPEND,0666);
+> 	if(IS_ERR(dest)||dest==NULL){
+> 		printk("Can't open/create file.");
+> 		return -1;
+> 	}
+> 	struct task_struct * taskp=get_pid_task(find_get_pid(proc),PIDTYPE_PID);
+> 	if(!taskp){
+> 		printk("Can't find the process");
+> 		return -2;
+> 	}
+> 	printk(KERN_ALERT "process name is %s\nPID_number is %ld\nvruntime is %llu\npriority is %d\nrecent_used_cpu is %d\nflags are %u",taskp->comm,(long)task_pid_nr(taskp),taskp->se.vruntime,taskp->prio,taskp->recent_used_cpu,taskp->flags);
+> 	char buf[1000];
+> 	sprintf(buf,"process name is %s\nPID_number is %ld\nvruntime is %llu\npriority is %d\nrecent_used_cpu is %d\nflags are %u",taskp->comm,(long)task_pid_nr(taskp),taskp->se.vruntime,taskp->prio,taskp->recent_used_cpu,taskp->flags);
+> 	kernel_write(dest,buf,strlen(buf),0);
+> 	return 0;
+> }
+\ No newline at end of file
+Only in linux-5.9.1/tools/objtool/arch/x86: lib
+Only in linux-5.9.1/tools/objtool: fixdep
+Only in linux-5.9.1/tools/objtool: objtool
